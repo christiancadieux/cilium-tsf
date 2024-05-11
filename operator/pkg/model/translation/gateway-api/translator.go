@@ -5,6 +5,8 @@ package gateway_api
 
 import (
 	"fmt"
+	"github.com/cilium/cilium/operator/pkg/model/ingestion"
+	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -101,6 +103,10 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 			Protocol: corev1.ProtocolTCP,
 		})
 	}
+	sourceRanges := []string{"0.0.0.0/0"}
+	if v, ok := annotations[ingestion.SOURCE_RANGE_PREFIX]; ok {
+		sourceRanges = strings.Split(v, ",")
+	}
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -119,8 +125,9 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 			},
 		},
 		Spec: corev1.ServiceSpec{
-			Type:  corev1.ServiceTypeLoadBalancer,
-			Ports: ports,
+			Type:                     corev1.ServiceTypeLoadBalancer,
+			Ports:                    ports,
+			LoadBalancerSourceRanges: sourceRanges,
 		},
 	}
 }

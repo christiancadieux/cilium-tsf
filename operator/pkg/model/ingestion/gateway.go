@@ -34,6 +34,10 @@ type Input struct {
 	ServiceImports  []mcsapiv1alpha1.ServiceImport
 }
 
+const (
+	SOURCE_RANGE_PREFIX = "rdei.io/lb-source-range"
+)
+
 // GatewayAPI translates Gateway API resources into a model.
 // TODO(tam): Support GatewayClass
 func GatewayAPI(input Input) ([]model.HTTPListener, []model.TLSPassthroughListener) {
@@ -44,6 +48,12 @@ func GatewayAPI(input Input) ([]model.HTTPListener, []model.TLSPassthroughListen
 	if input.Gateway.Spec.Infrastructure != nil {
 		labels = toMapString(input.Gateway.Spec.Infrastructure.Labels)
 		annotations = toMapString(input.Gateway.Spec.Infrastructure.Annotations)
+	}
+	if v, ok := input.Gateway.Annotations[SOURCE_RANGE_PREFIX]; ok {
+		if annotations == nil {
+			annotations = map[string]string{}
+		}
+		annotations[SOURCE_RANGE_PREFIX] = v
 	}
 
 	var infra *model.Infrastructure
