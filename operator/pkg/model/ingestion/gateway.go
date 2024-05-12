@@ -35,7 +35,7 @@ type Input struct {
 }
 
 const (
-	SOURCE_RANGE_PREFIX = "rdei.io/lb-source-range"
+	SOURCE_RANGE_PREFIX = "service.kubernetes.io/lb-source-ranges"
 )
 
 // GatewayAPI translates Gateway API resources into a model.

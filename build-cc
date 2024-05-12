@@ -18,4 +18,6 @@ docker tag quay.io/cilium/operator-generic:v1.16.0.cc hub.comcast.net/k8s-eng/ci
 docker push hub.comcast.net/k8s-eng/cilium/operator-generic:v1.16.0.cc
 
 # Tag
-# git tag -a "v1.16.0.cc" -m "v1.16.0.cc"
+git tag -a "v1.16.0.cc" -m "v1.16.0.cc"
+git push origin v1.16.0.cc
+
