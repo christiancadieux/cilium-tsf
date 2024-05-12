@@ -104,7 +104,7 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 		})
 	}
 	// needed to be set to 0.0.0.0/0 because there is a bug in the existing implementation of
-	// LoadBalancerSourceRanges and when then sourceRanges is set to a value, then set to null,
+	// LoadBalancerSourceRanges and when the sourceRanges is set to a value, then set to null,
 	// the service still prevent access. but if the value is 0.0.0.0/0 (instead of null or missing), it works.
 	sourceRanges := []string{"0.0.0.0/0"}
 	if v, ok := annotations[ingestion.SOURCE_RANGE_PREFIX]; ok {
