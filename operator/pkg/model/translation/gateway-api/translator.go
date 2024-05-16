@@ -107,8 +107,12 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 	// LoadBalancerSourceRanges and when the sourceRanges is set to a value, then set to null,
 	// the service still prevent access. but if the value is 0.0.0.0/0 (instead of null or missing), it works.
 	sourceRanges := []string{"0.0.0.0/0"}
-	if v, ok := annotations[ingestion.SOURCE_RANGE_PREFIX]; ok {
+	if v, ok := annotations[ingestion.ANNOT_SOURCE_RANGE_PREFIX]; ok {
 		sourceRanges = strings.Split(v, ",")
+	}
+	familyPolicy := corev1.IPFamilyPolicySingleStack
+	if v, ok := annotations[ingestion.ANNOT_FAMILY_POLICY]; ok {
+		familyPolicy = corev1.IPFamilyPolicy(v)
 	}
 
 	return &corev1.Service{
@@ -131,6 +135,7 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 			Type:                     corev1.ServiceTypeLoadBalancer,
 			Ports:                    ports,
 			LoadBalancerSourceRanges: sourceRanges,
+			IPFamilyPolicy:           &familyPolicy,
 		},
 	}
 }

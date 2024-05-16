@@ -35,7 +35,8 @@ type Input struct {
 }
 
 const (
-	SOURCE_RANGE_PREFIX = "service.kubernetes.io/lb-source-ranges"
+	ANNOT_SOURCE_RANGE_PREFIX = "service.kubernetes.io/lb-source-ranges"
+	ANNOT_FAMILY_POLICY       = "service.kubernetes.io/lb-family-policy"
 )
 
 // GatewayAPI translates Gateway API resources into a model.
@@ -49,11 +50,17 @@ func GatewayAPI(input Input) ([]model.HTTPListener, []model.TLSPassthroughListen
 		labels = toMapString(input.Gateway.Spec.Infrastructure.Labels)
 		annotations = toMapString(input.Gateway.Spec.Infrastructure.Annotations)
 	}
-	if v, ok := input.Gateway.Annotations[SOURCE_RANGE_PREFIX]; ok {
+	if v, ok := input.Gateway.Annotations[ANNOT_SOURCE_RANGE_PREFIX]; ok {
 		if annotations == nil {
 			annotations = map[string]string{}
 		}
-		annotations[SOURCE_RANGE_PREFIX] = v
+		annotations[ANNOT_SOURCE_RANGE_PREFIX] = v
+	}
+	if v, ok := input.Gateway.Annotations[ANNOT_FAMILY_POLICY]; ok {
+		if annotations == nil {
+			annotations = map[string]string{}
+		}
+		annotations[ANNOT_FAMILY_POLICY] = v
 	}
 
 	var infra *model.Infrastructure
