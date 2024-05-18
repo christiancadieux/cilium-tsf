@@ -111,8 +111,17 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 		sourceRanges = strings.Split(v, ",")
 	}
 	familyPolicy := corev1.IPFamilyPolicySingleStack
+	ipfamilies := []corev1.IPFamily{}
+	ipfamilies = append(ipfamilies, corev1.IPv4Protocol)
+
 	if v, ok := annotations[ingestion.ANNOT_FAMILY_POLICY]; ok {
-		familyPolicy = corev1.IPFamilyPolicy(v)
+		if v == "IPv6" {
+			ipfamilies[0] = corev1.IPv6Protocol
+		} else {
+			familyPolicy = corev1.IPFamilyPolicy(v)
+			ipfamilies = append(ipfamilies, corev1.IPv6Protocol)
+		}
+
 	}
 
 	return &corev1.Service{
@@ -135,6 +144,7 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 			Type:                     corev1.ServiceTypeLoadBalancer,
 			Ports:                    ports,
 			LoadBalancerSourceRanges: sourceRanges,
+			IPFamilies:               ipfamilies,
 			IPFamilyPolicy:           &familyPolicy,
 		},
 	}
