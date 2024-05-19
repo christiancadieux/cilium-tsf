@@ -107,20 +107,25 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 	// LoadBalancerSourceRanges and when the sourceRanges is set to a value, then set to null,
 	// the service still prevent access. but if the value is 0.0.0.0/0 (instead of null or missing), it works.
 	sourceRanges := []string{"0.0.0.0/0", "::/0"}
-	if v, ok := annotations[ingestion.ANNOT_SOURCE_RANGE_PREFIX]; ok {
+	if v, ok := annotations[ingestion.ANNOT_loadBalancerSourceRanges]; ok {
 		sourceRanges = strings.Split(v, ",")
 	}
 	familyPolicy := corev1.IPFamilyPolicySingleStack
 	ipfamilies := []corev1.IPFamily{}
 	ipfamilies = append(ipfamilies, corev1.IPv4Protocol)
 
-	if v, ok := annotations[ingestion.ANNOT_FAMILY_POLICY]; ok {
+	if v, ok := annotations[ingestion.ANNOT_ipFamilyPolicy]; ok {
 		if v == "IPv6" {
 			ipfamilies[0] = corev1.IPv6Protocol
 		} else {
 			familyPolicy = corev1.IPFamilyPolicy(v)
 			ipfamilies = append(ipfamilies, corev1.IPv6Protocol)
 		}
+
+	}
+	extPolicy := corev1.ServiceExternalTrafficPolicyCluster
+	if v, ok := annotations[ingestion.ANNOT_externalTrafficPolicy]; ok {
+		extPolicy = corev1.ServiceExternalTrafficPolicy(v)
 
 	}
 
@@ -143,6 +148,7 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 		Spec: corev1.ServiceSpec{
 			Type:                     corev1.ServiceTypeLoadBalancer,
 			Ports:                    ports,
+			ExternalTrafficPolicy:    extPolicy,
 			LoadBalancerSourceRanges: sourceRanges,
 			IPFamilies:               ipfamilies,
 			IPFamilyPolicy:           &familyPolicy,
