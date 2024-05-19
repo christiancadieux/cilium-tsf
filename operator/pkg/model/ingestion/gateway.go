@@ -40,6 +40,10 @@ const (
 	ANNOT_externalTrafficPolicy    = "service.kubernetes.io/external-traffic-policy"
 )
 
+func transferGatewayAnnotations() {
+
+}
+
 // GatewayAPI translates Gateway API resources into a model.
 // TODO(tam): Support GatewayClass
 func GatewayAPI(input Input) ([]model.HTTPListener, []model.TLSPassthroughListener) {
@@ -51,7 +55,16 @@ func GatewayAPI(input Input) ([]model.HTTPListener, []model.TLSPassthroughListen
 		labels = toMapString(input.Gateway.Spec.Infrastructure.Labels)
 		annotations = toMapString(input.Gateway.Spec.Infrastructure.Annotations)
 	}
+
+	// transfer gateway Annotations
 	annotList := []string{ANNOT_loadBalancerSourceRanges, ANNOT_ipFamilyPolicy, ANNOT_externalTrafficPolicy}
+	if annotations != nil {
+		for _, annot := range annotList {
+			if _, ok := annotations[annot]; ok {
+				delete(annotations, annot)
+			}
+		}
+	}
 	for _, annot := range annotList {
 		if v, ok := input.Gateway.Annotations[annot]; ok {
 			if annotations == nil {
