@@ -104,7 +104,7 @@ func getService(resource *model.FullyQualifiedResource, allPorts []uint32, label
 		})
 	}
 
-	var sourceRanges []string // := []string{"0.0.0.0/0", "::/0"}
+	var sourceRanges = []string{"9999:1:1:1::1:1/64"}
 	if v, ok := annotations[ingestion.ANNOT_loadBalancerSourceRanges]; ok {
 		sourceRanges = strings.Split(v, ",")
 	}
