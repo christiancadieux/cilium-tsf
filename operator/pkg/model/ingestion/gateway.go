@@ -60,6 +60,9 @@ func GatewayAPI(input Input) ([]model.HTTPListener, []model.TLSPassthroughListen
 	annotList := []string{ANNOT_loadBalancerSourceRanges, ANNOT_ipFamilyPolicy, ANNOT_externalTrafficPolicy}
 
 	for _, annot := range annotList {
+		if annotations != nil {
+			delete(annotations, annot)
+		}
 		if v, ok := input.Gateway.Annotations[annot]; ok {
 			if annotations == nil {
 				annotations = map[string]string{}
